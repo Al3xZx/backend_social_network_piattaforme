@@ -11,6 +11,6 @@ public class TestController {
 
     @GetMapping(value = "/prova")
     public String test(@RequestParam(name = "nome") String n){
-        return "ciao "+n;
+        return "ciao "+n+"!";
     }
 }
