@@ -1,7 +1,5 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
-import com.sun.xml.bind.v2.TODO;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -39,8 +37,8 @@ public class Utente implements Serializable {
 
     @ManyToMany()
     @JoinTable(name = "richieste_amicizie",
-            joinColumns = {@JoinColumn(name = "id_richiedente", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "id_ricevente", referencedColumnName = "id")})
+            joinColumns = @JoinColumn(name = "id_richiedente", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_ricevente", referencedColumnName = "id"))
     private List<Utente> richiesteAmicizie = new LinkedList<>();
 
     @OneToMany(mappedBy = "utente")
