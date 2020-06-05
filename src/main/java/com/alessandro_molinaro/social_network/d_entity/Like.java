@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "like")
+@Table(name = "likes")
 public class Like implements Serializable {
     private static final long serialVersionUID = 5514858274833550798L;
 
@@ -19,11 +19,11 @@ public class Like implements Serializable {
     private Date dataCreazione = new Date();
 
     @ManyToOne
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_post", nullable = false)
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "id_utente")
+    @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
     public Long getId() {

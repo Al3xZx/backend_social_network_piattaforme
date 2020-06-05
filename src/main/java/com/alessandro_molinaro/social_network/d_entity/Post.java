@@ -25,7 +25,7 @@ public class Post implements Serializable {
     private String testo;
 
     @ManyToOne
-    @JoinColumn(name = "id_utente")
+    @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
     @OneToMany(mappedBy = "post")

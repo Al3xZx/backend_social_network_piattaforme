@@ -36,7 +36,7 @@ public class Utente implements Serializable {
     private List<Utente> amici = new LinkedList<>();
 
     @ManyToMany()
-    @JoinTable(name = "richieste_amicizie",
+    @JoinTable(name = "richiesta_amicizia",
             joinColumns = @JoinColumn(name = "id_richiedente", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "id_ricevente", referencedColumnName = "id"))
     private List<Utente> richiesteAmicizie = new LinkedList<>();

@@ -24,11 +24,11 @@ public class Commento implements Serializable {
     private String testo;
 
     @ManyToOne
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_post", nullable = false)
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "id_utente")
+    @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
     public Long getId() {
