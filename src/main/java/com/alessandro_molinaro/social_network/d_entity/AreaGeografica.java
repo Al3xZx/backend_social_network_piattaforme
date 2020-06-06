@@ -16,17 +16,26 @@ public class AreaGeografica implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String nazione;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String regione;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String citta;
 
     @OneToMany(mappedBy = "areaGeografica")
     private List<Utente> residenti = new LinkedList<>();
+
+    public AreaGeografica() {
+    }
+
+    public AreaGeografica(String nazione, String regione, String citta) {
+        this.nazione = nazione;
+        this.regione = regione;
+        this.citta = citta;
+    }
 
     public Long getId() {
         return id;

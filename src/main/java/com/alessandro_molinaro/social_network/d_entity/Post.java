@@ -22,6 +22,7 @@ public class Post implements Serializable {
     private Date dataCreazione = new Date();
 
     @Column(name = "contenuto_testuale", nullable = false)
+    @Lob //per indicare longtext
     private String testo;
 
     @ManyToOne

@@ -21,6 +21,7 @@ public class Commento implements Serializable {
     private Date dataCreazione = new Date();
 
     @Column(name = "contenuto_testuale", nullable = false)
+    @Lob
     private String testo;
 
     @ManyToOne
