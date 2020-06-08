@@ -1,11 +1,15 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -41,21 +45,26 @@ public class Utente implements Serializable {
     @JoinTable(name = "amici",
             joinColumns = {@JoinColumn(name = "id_utente_A", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "id_utente_B", referencedColumnName = "id")})
-    private List<Utente> amici = new LinkedList<>();
+    @JsonIgnore
+    private Set<Utente> amici = new HashSet<>();
 
     @ManyToMany()
-    @JoinTable(name = "richiesta_amicizia",
-            joinColumns = @JoinColumn(name = "id_richiedente", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "id_ricevente", referencedColumnName = "id"))
-    private List<Utente> richiesteAmicizie = new LinkedList<>();
+    @JoinTable(name = "richieste_amicizia",
+            joinColumns = @JoinColumn(name = "id_ricevente", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_richiedente", referencedColumnName = "id"))
+    @JsonIgnore
+    private List<Utente> richiesteAmicizie = new LinkedList<>();//richieste di amicizia inviate da altri utenti
 
     @OneToMany(mappedBy = "utente")
+    @JsonIgnore
     private List<Commento> commenti = new LinkedList<>();
 
     @OneToMany(mappedBy = "utente")
+    @JsonIgnore
     private List<Post> posts = new LinkedList<>();
 
     @OneToMany(mappedBy = "utente")
+    @JsonIgnore
     private List<Like> likes = new LinkedList<>();
 
     public Utente() {
@@ -116,11 +125,11 @@ public class Utente implements Serializable {
         this.areaGeografica = areaGeografica;
     }
 
-    public List<Utente> getAmici() {
+    public Set<Utente> getAmici() {
         return amici;
     }
 
-    public void setAmici(List<Utente> amici) {
+    public void setAmici(Set<Utente> amici) {
         this.amici = amici;
     }
 

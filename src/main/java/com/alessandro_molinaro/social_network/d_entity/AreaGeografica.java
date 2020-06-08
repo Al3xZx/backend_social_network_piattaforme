@@ -1,5 +1,7 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -26,6 +28,7 @@ public class AreaGeografica implements Serializable {
     private String citta;
 
     @OneToMany(mappedBy = "areaGeografica")
+    @JsonIgnore
     private List<Utente> residenti = new LinkedList<>();
 
     public AreaGeografica() {
