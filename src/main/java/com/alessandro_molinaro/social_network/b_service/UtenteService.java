@@ -5,10 +5,7 @@ import com.alessandro_molinaro.social_network.c_repository.UtenteRepository;
 import com.alessandro_molinaro.social_network.d_entity.AreaGeografica;
 import com.alessandro_molinaro.social_network.d_entity.Post;
 import com.alessandro_molinaro.social_network.d_entity.Utente;
-import com.alessandro_molinaro.social_network.support.exception.EmailEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.RichiestaAmiciziaEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.RichiestaAmiciziaNonEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.UtenteNonEsistenteException;
+import com.alessandro_molinaro.social_network.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,7 +74,7 @@ public class UtenteService {
     @Transactional(readOnly = true)
     public List<Utente> getUtentiNomeOrCognomeContain(String s, int numPag, int numOfPage){
         //return utenteRepository.findAllByNomeContainingOrCognomeContaining(s);
-        return utenteRepository.findAllByNomeContainingOrCognomeContaining(s, PageRequest.of(numPag,numOfPage));
+        return utenteRepository.selAllByNomeContainingOrCognomeContaining(s, PageRequest.of(numPag,numOfPage));
     }
 
 //    @Transactional(readOnly = true)
@@ -100,7 +97,8 @@ public class UtenteService {
     /*-------------------------gestione richiesta amicizia------------------------------*/
 
     @Transactional
-    public void inviaRichiestaAmicizia(Long userIdRichiedente, Long userIdRicevente) throws UtenteNonEsistenteException, RichiestaAmiciziaEsistenteException {
+    public void inviaRichiestaAmicizia(Long userIdRichiedente, Long userIdRicevente)
+            throws UtenteNonEsistenteException, RichiestaAmiciziaEsistenteException, AmiciziaEsistenteException {
         Optional<Utente> oRichiedente = utenteRepository.findById(userIdRichiedente);
         Optional<Utente> oRicevente = utenteRepository.findById(userIdRicevente);
         Utente richiedente;
@@ -113,6 +111,10 @@ public class UtenteService {
 
         if(utenteRepository.richiestaAmicizia(userIdRichiedente, userIdRicevente) != null)
             throw new RichiestaAmiciziaEsistenteException();
+
+        if(richiedente.getAmici().contains(ricevente))
+            throw new AmiciziaEsistenteException();
+
         ricevente.getRichiesteAmicizie().add(richiedente);
     }
 
@@ -164,6 +166,7 @@ public class UtenteService {
 
     /*-------------------------info amici e post------------------------------*/
 
+    @Transactional(readOnly = true)
     public Set<Utente> getAllAmici(Long userId)throws UtenteNonEsistenteException{
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;
@@ -174,6 +177,7 @@ public class UtenteService {
             throw new UtenteNonEsistenteException();
     }
 
+    @Transactional(readOnly = true)
     public List<Post> getAllPost(Long userId)throws UtenteNonEsistenteException{
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;

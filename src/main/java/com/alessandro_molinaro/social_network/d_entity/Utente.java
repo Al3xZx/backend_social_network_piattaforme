@@ -59,13 +59,13 @@ public class Utente implements Serializable {
     @JsonIgnore
     private List<Commento> commenti = new LinkedList<>();
 
-    @OneToMany(mappedBy = "utente")
+    @OneToMany(mappedBy = "utente") //se elimino un post lo elimino anche dalla tabella post
     @JsonIgnore
     private List<Post> posts = new LinkedList<>();
 
     @OneToMany(mappedBy = "utente")
     @JsonIgnore
-    private List<Like> likes = new LinkedList<>();
+    private Set<Like> likes = new HashSet<>();
 
     public Utente() {
     }
@@ -157,11 +157,29 @@ public class Utente implements Serializable {
         this.posts = posts;
     }
 
-    public List<Like> getLikes() {
+    public Set<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<Like> likes) {
+    public void setLikes(Set<Like> likes) {
         this.likes = likes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Utente utente = (Utente) o;
+
+        if (id != null ? !id.equals(utente.id) : utente.id != null) return false;
+        return email != null ? email.equals(utente.email) : utente.email == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        return result;
     }
 }

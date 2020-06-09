@@ -8,6 +8,8 @@ import com.alessandro_molinaro.social_network.d_entity.Commento;
 import com.alessandro_molinaro.social_network.d_entity.Like;
 import com.alessandro_molinaro.social_network.d_entity.Post;
 import com.alessandro_molinaro.social_network.d_entity.Utente;
+import com.alessandro_molinaro.social_network.support.exception.LikePresenteException;
+import com.alessandro_molinaro.social_network.support.exception.NonAmiciException;
 import com.alessandro_molinaro.social_network.support.exception.PostNonEsistenteException;
 import com.alessandro_molinaro.social_network.support.exception.UtenteNonEsistenteException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +55,7 @@ public class PostService {
     }
 
     @Transactional
-    public Like aggiungiLike(Long userId, Long postId)throws UtenteNonEsistenteException, PostNonEsistenteException {
+    public void removePost(long postId, Long userId)throws UtenteNonEsistenteException, PostNonEsistenteException {
         Optional<Post> op = postRepository.findById(postId);
         Optional<Utente> ou = utenteRepository.findById(userId);
         Utente utente;
@@ -65,6 +68,30 @@ public class PostService {
             post = op.get();
         } else
             throw new PostNonEsistenteException();
+//        List<Post> posts= utente.getPosts();
+//        if(!posts.remove(post))
+//            throw new PostNonEsistenteException();
+        postRepository.delete(post);
+    }
+
+    @Transactional
+    public Like aggiungiLike(Long userId, Long postId)
+            throws UtenteNonEsistenteException, PostNonEsistenteException, LikePresenteException {
+        Optional<Post> op = postRepository.findById(postId);
+        Optional<Utente> ou = utenteRepository.findById(userId);
+        Utente utente;
+        Post post;
+        if(ou.isPresent()) {
+            utente = ou.get();
+        } else
+            throw new UtenteNonEsistenteException();
+        if(op.isPresent()) {
+            post = op.get();
+        } else
+            throw new PostNonEsistenteException();
+
+        if(likeRepository.existsByUtenteAndPost(utente, post))
+            throw new LikePresenteException();
 
         Like l = new Like();
         l.setPost(post);
@@ -76,7 +103,8 @@ public class PostService {
     }
 
     @Transactional
-    public Commento aggiungiCommento(Long userId, Long postId, Commento c)throws UtenteNonEsistenteException, PostNonEsistenteException{
+    public Commento aggiungiCommento(Long userId, Long postId, Commento c)
+            throws UtenteNonEsistenteException, PostNonEsistenteException, NonAmiciException {
         Optional<Post> op = postRepository.findById(postId);
         Optional<Utente> ou = utenteRepository.findById(userId);
         Utente utente;
@@ -89,7 +117,8 @@ public class PostService {
             post = op.get();
         } else
             throw new PostNonEsistenteException();
-
+        if(!utente.getAmici().contains(post.getUtente()))
+            throw new NonAmiciException();
         Commento nuovoCommento = new Commento();
         nuovoCommento.setTesto(c.getTesto());
         nuovoCommento.setPost(post);
@@ -99,7 +128,7 @@ public class PostService {
         return nuovoCommento;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Post> getPostPage(Long userId, int numPage, int numOfPage) throws UtenteNonEsistenteException {
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;
@@ -116,7 +145,7 @@ public class PostService {
         Utente u;
         if(o.isPresent()) {
             u = o.get();
-            return null;//TODO
+            return postRepository.selAllPostDiAmici(userId, PageRequest.of(numPage, numOfPage, Sort.by("data_creazione").descending()));
         } else
             throw new UtenteNonEsistenteException();
     }

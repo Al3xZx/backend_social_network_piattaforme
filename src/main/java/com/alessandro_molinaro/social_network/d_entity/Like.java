@@ -1,8 +1,10 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "likes")
@@ -14,9 +16,9 @@ public class Like implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
     @Column(name = "data_creazione", nullable = false)
-    private Date dataCreazione = new Date();
+    private LocalDateTime dataCreazione = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "id_post", nullable = false)
@@ -34,11 +36,11 @@ public class Like implements Serializable {
         this.id = id;
     }
 
-    public Date getDataCreazione() {
+    public LocalDateTime getDataCreazione() {
         return dataCreazione;
     }
 
-    public void setDataCreazione(Date dataCreazione) {
+    public void setDataCreazione(LocalDateTime dataCreazione) {
         this.dataCreazione = dataCreazione;
     }
 
@@ -56,5 +58,20 @@ public class Like implements Serializable {
 
     public void setUtente(Utente utente) {
         this.utente = utente;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Like like = (Like) o;
+
+        return id.equals(like.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

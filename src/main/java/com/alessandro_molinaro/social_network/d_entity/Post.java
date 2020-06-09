@@ -1,10 +1,13 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Table(name = "post")
@@ -17,9 +20,13 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
+//    @Temporal(TemporalType.DATE)
+//    @DateTimeFormat(pattern = "dd/MM/yyyy")
+//    @Basic
+//    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
     @Column(name = "data_creazione", nullable = false)
-    private Date dataCreazione = new Date();
+    private LocalDateTime dataCreazione = LocalDateTime.now();
 
     @Column(name = "contenuto_testuale", nullable = false)
     @Lob //per indicare longtext
@@ -30,10 +37,12 @@ public class Post implements Serializable {
     private Utente utente;
 
     @OneToMany(mappedBy = "post")
+    @JsonIgnore
     private List<Commento> commenti = new LinkedList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<Like> likes = new LinkedList<>();
+    @JsonIgnore
+    private Set<Like> likes = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -43,11 +52,11 @@ public class Post implements Serializable {
         this.id = id;
     }
 
-    public Date getDataCreazione() {
+    public LocalDateTime getDataCreazione() {
         return dataCreazione;
     }
 
-    public void setDataCreazione(Date dataCreazione) {
+    public void setDataCreazione(LocalDateTime dataCreazione) {
         this.dataCreazione = dataCreazione;
     }
 
@@ -75,11 +84,11 @@ public class Post implements Serializable {
         this.commenti = commenti;
     }
 
-    public List<Like> getLikes() {
+    public Set<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<Like> likes) {
+    public void setLikes(Set<Like> likes) {
         this.likes = likes;
     }
 }

@@ -1,8 +1,11 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.annotation.processing.Generated;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -16,9 +19,9 @@ public class Commento implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
     @Column(name = "data_creazione", nullable = false)
-    private Date dataCreazione = new Date();
+    private LocalDateTime dataCreazione = LocalDateTime.now();
 
     @Column(name = "contenuto_testuale", nullable = false)
     @Lob
@@ -40,11 +43,11 @@ public class Commento implements Serializable {
         this.id = id;
     }
 
-    public Date getDataCreazione() {
+    public LocalDateTime getDataCreazione() {
         return dataCreazione;
     }
 
-    public void setDataCreazione(Date dataCreazione) {
+    public void setDataCreazione(LocalDateTime dataCreazione) {
         this.dataCreazione = dataCreazione;
     }
 

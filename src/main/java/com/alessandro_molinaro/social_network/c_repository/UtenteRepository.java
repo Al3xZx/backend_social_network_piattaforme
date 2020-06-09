@@ -15,7 +15,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     boolean existsByEmail(String email);
 
     @Query(value = "SELECT * FROM utente u WHERE u.nome like %?1% OR u.cognome like %?1%", nativeQuery = true)
-    List<Utente> findAllByNomeContainingOrCognomeContaining(String s1, Pageable pageable);
+    List<Utente> selAllByNomeContainingOrCognomeContaining(String s1, Pageable pageable);
 
     List<Utente> findAllByNomeContaining(String nome);
 
@@ -24,9 +24,6 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     List<Utente> findAllByNomeAndCognome(String nome, String cognome);
 
     Utente findByEmail(String email);
-
-    @Query(value = "SELECT u FROM Utente u WHERE u.id = ?1")
-    Utente selById(Long id);
 
     @Query(value = "SELECT id_ricevente FROM richieste_amicizia WHERE id_richiedente = ?1 AND id_ricevente = ?2", nativeQuery = true)
     Long richiestaAmicizia(Long richiedente, Long ricevente);

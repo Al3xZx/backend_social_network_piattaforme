@@ -4,10 +4,7 @@ import com.alessandro_molinaro.social_network.b_service.UtenteService;
 import com.alessandro_molinaro.social_network.d_entity.AreaGeografica;
 import com.alessandro_molinaro.social_network.d_entity.Post;
 import com.alessandro_molinaro.social_network.d_entity.Utente;
-import com.alessandro_molinaro.social_network.support.exception.EmailEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.RichiestaAmiciziaEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.RichiestaAmiciziaNonEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.UtenteNonEsistenteException;
+import com.alessandro_molinaro.social_network.support.exception.*;
 import com.alessandro_molinaro.social_network.support.messageForClient.Messaggio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,10 +69,12 @@ public class UtenteController {
             return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
         } catch (RichiestaAmiciziaEsistenteException e) {
             return new ResponseEntity(new Messaggio("la richiesta è stata già eseguita"),HttpStatus.BAD_REQUEST);
+        } catch (AmiciziaEsistenteException e) {
+            return new ResponseEntity(new Messaggio("si è già amico con questo utente"),HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping(value = "/{userIdRicevente}/accept_friend_request/{userIdRichiedente}", produces = "apllication/json")
+    @PostMapping(value = "/{userIdRicevente}/accept_friend_request/{userIdRichiedente}")
     public ResponseEntity accettaRichiestaAmicizia(@PathVariable Long userIdRichiedente, @PathVariable Long userIdRicevente){
         try{
             utenteService.accettaRichiesta(userIdRichiedente, userIdRicevente);
@@ -91,11 +90,11 @@ public class UtenteController {
     public ResponseEntity rifiutaRichiestaAmicizia(@PathVariable Long userIdRichiedente, @PathVariable Long userIdRicevente){
         try{
             utenteService.rifiutaRichiesta(userIdRichiedente, userIdRicevente);
-            return new ResponseEntity(new Messaggio("richiesta rifiutata correttamente"),HttpStatus.OK);
+            return new ResponseEntity(new Messaggio("richiesta rifiutata correttamente"), HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new Messaggio("l'utente non esiste"), HttpStatus.BAD_REQUEST);
         } catch (RichiestaAmiciziaNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -131,7 +130,7 @@ public class UtenteController {
 
     @GetMapping(value = "/search/{stringa}/{numPag}/{numOfPag}")
     public ResponseEntity richiesteAmicizia(@PathVariable String stringa, @PathVariable int numPag, @PathVariable int numOfPag){
-        List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa, numPag, numOfPag);
+        List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa, numPag-1, numOfPag);
         //List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa);
         return new ResponseEntity(utenti,HttpStatus.OK);
     }
