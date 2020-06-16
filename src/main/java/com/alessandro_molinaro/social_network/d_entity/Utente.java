@@ -57,11 +57,11 @@ public class Utente implements Serializable {
 
     @OneToMany(mappedBy = "utente")
     @JsonIgnore
-    private List<Commento> commenti = new LinkedList<>();
+    private List<Commento> commenti = new LinkedList<>();//commenti effettuati da this
 
     @OneToMany(mappedBy = "utente") //se elimino un post lo elimino anche dalla tabella post
     @JsonIgnore
-    private List<Post> posts = new LinkedList<>();
+    private List<Post> posts = new LinkedList<>();//post effettuati da this
 
     @OneToMany(mappedBy = "utente")
     @JsonIgnore

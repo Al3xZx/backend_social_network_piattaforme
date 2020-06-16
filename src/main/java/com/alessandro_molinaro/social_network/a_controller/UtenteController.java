@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -33,9 +34,11 @@ public class UtenteController {
             Utente u = utenteService.registraUtente(utente);
             return new ResponseEntity(u, HttpStatus.OK);
         } catch (EmailEsistenteException e) {
-            return new ResponseEntity(new Messaggio("email già associata ad un utente registrato"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("email già associata ad un utente registrato"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email già associata ad un utente registrato", e);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("utente non ancora registrato per poter aggiungere un indirizzo"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("utente non ancora registrato per poter aggiungere un indirizzo"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "registrazione non andata a buon fine!!", e);
         }
     }
 
@@ -55,7 +58,8 @@ public class UtenteController {
             Utente u = utenteService.getUtente(userId);
             return new ResponseEntity(u,HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found!", e);
         }
     }
 

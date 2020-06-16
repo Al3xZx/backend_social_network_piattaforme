@@ -37,7 +37,8 @@ public class UtenteService {
     }
 
     @Transactional
-    public AreaGeografica aggiungiModificaAreaGeografica(Long userId, AreaGeografica ag) throws UtenteNonEsistenteException {
+    public AreaGeografica aggiungiModificaAreaGeografica(Long userId, AreaGeografica ag)
+            throws UtenteNonEsistenteException {
         AreaGeografica area = areaGeograficaRepository
                 .findByNazioneAndRegioneAndCitta(ag.getNazione(), ag.getRegione(), ag.getCitta());
         Utente utente = utenteRepository.findById(userId).get();
@@ -119,7 +120,8 @@ public class UtenteService {
     }
 
     @Transactional
-    public void accettaRichiesta(Long userIdRichiedente, Long userIdRicevente)throws UtenteNonEsistenteException, RichiestaAmiciziaNonEsistenteException {
+    public void accettaRichiesta(Long userIdRichiedente, Long userIdRicevente)
+            throws UtenteNonEsistenteException, RichiestaAmiciziaNonEsistenteException {
         Optional<Utente> oRichiedente = utenteRepository.findById(userIdRichiedente);
         Optional<Utente> oRicevente = utenteRepository.findById(userIdRicevente);
         Utente richiedente;
@@ -138,7 +140,8 @@ public class UtenteService {
     }
 
     @Transactional
-    public void rifiutaRichiesta(Long userIdRichiedente, Long userIdRicevente)throws UtenteNonEsistenteException, RichiestaAmiciziaNonEsistenteException{
+    public void rifiutaRichiesta(Long userIdRichiedente, Long userIdRicevente)
+            throws UtenteNonEsistenteException, RichiestaAmiciziaNonEsistenteException{
         Optional<Utente> oRichiedente = utenteRepository.findById(userIdRichiedente);
         Optional<Utente> oRicevente = utenteRepository.findById(userIdRicevente);
         Utente richiedente;
