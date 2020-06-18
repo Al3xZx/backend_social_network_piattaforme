@@ -24,7 +24,7 @@ public class Post implements Serializable {
 //    @DateTimeFormat(pattern = "dd/MM/yyyy")
 //    @Basic
 //    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
     @Column(name = "data_creazione", nullable = false)
     private LocalDateTime dataCreazione = LocalDateTime.now();
 
@@ -37,11 +37,11 @@ public class Post implements Serializable {
     private Utente utente;
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+    //@JsonIgnore
     private List<Commento> commenti = new LinkedList<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+    //@JsonIgnore
     private Set<Like> likes = new HashSet<>();
 
     public Long getId() {

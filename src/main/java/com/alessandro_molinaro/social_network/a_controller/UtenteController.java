@@ -1,7 +1,6 @@
 package com.alessandro_molinaro.social_network.a_controller;
 
 import com.alessandro_molinaro.social_network.b_service.UtenteService;
-import com.alessandro_molinaro.social_network.d_entity.AreaGeografica;
 import com.alessandro_molinaro.social_network.d_entity.Post;
 import com.alessandro_molinaro.social_network.d_entity.Utente;
 import com.alessandro_molinaro.social_network.support.exception.*;
@@ -9,48 +8,20 @@ import com.alessandro_molinaro.social_network.support.messageForClient.Messaggio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
 
 @RestController
 @RequestMapping(value = "/user")
+@CrossOrigin(origins="http://localhost:4200")
 public class UtenteController {
 
     @Autowired
     UtenteService utenteService;
-
-    @PostMapping(value = "/add_user")
-    public ResponseEntity aggiungi(@Valid @RequestBody Utente utente, Errors errors){
-        if (errors.hasErrors()) {
-            return new ResponseEntity(new Messaggio("errore di validazione dei campi"), HttpStatus.BAD_REQUEST);
-        }
-        try {
-            Utente u = utenteService.registraUtente(utente);
-            return new ResponseEntity(u, HttpStatus.OK);
-        } catch (EmailEsistenteException e) {
-            //return new ResponseEntity(new Messaggio("email già associata ad un utente registrato"),HttpStatus.BAD_REQUEST);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email già associata ad un utente registrato", e);
-        } catch (UtenteNonEsistenteException e) {
-            //return new ResponseEntity(new Messaggio("utente non ancora registrato per poter aggiungere un indirizzo"),HttpStatus.BAD_REQUEST);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "registrazione non andata a buon fine!!", e);
-        }
-    }
-
-    @PostMapping(value = "/{userId}/set_geographic_area")
-    public ResponseEntity setAreaGeografica(@PathVariable Long userId, @RequestBody AreaGeografica a){
-        try{
-            AreaGeografica area = utenteService.aggiungiModificaAreaGeografica(userId, a);
-            return new ResponseEntity(area,HttpStatus.OK);
-        } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @GetMapping(value = "/{userId}/info")
     public ResponseEntity getInfoUtente(@PathVariable Long userId){
@@ -59,22 +30,24 @@ public class UtenteController {
             return new ResponseEntity(u,HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
             //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found!", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         }
     }
-
 
     @PostMapping(value = "/{userIdRichiedente}/send_friend_request/{userIdRicevente}")
     public ResponseEntity richiestaAmicizia(@PathVariable Long userIdRichiedente, @PathVariable Long userIdRicevente){
         try{
             utenteService.inviaRichiestaAmicizia(userIdRichiedente,userIdRicevente);
-            return new ResponseEntity(new Messaggio("richiesta registrata correttamente"),HttpStatus.OK);
+            return new ResponseEntity(new Messaggio("richiesta registrata correttamente"),HttpStatus.CREATED);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         } catch (RichiestaAmiciziaEsistenteException e) {
-            return new ResponseEntity(new Messaggio("la richiesta è stata già eseguita"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("la richiesta è stata già eseguita"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la richiesta è stata già eseguita", e);
         } catch (AmiciziaEsistenteException e) {
-            return new ResponseEntity(new Messaggio("si è già amico con questo utente"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("si è già amico con questo utente"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "si è già amico con questo utente", e);
         }
     }
 
@@ -84,9 +57,11 @@ public class UtenteController {
             utenteService.accettaRichiesta(userIdRichiedente, userIdRicevente);
             return new ResponseEntity(new Messaggio("richiesta accettata correttamente"),HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+           // return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         } catch (RichiestaAmiciziaNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la richiesta da parte dell'utente selezionato non esiste", e);
         }
     }
 
@@ -96,9 +71,20 @@ public class UtenteController {
             utenteService.rifiutaRichiesta(userIdRichiedente, userIdRicevente);
             return new ResponseEntity(new Messaggio("richiesta rifiutata correttamente"), HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"), HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         } catch (RichiestaAmiciziaNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"), HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("la richiesta da parte dell'utente selezionato non esiste"), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "la richiesta da parte dell'utente selezionato non esiste", e);
+        }
+    }
+
+    @GetMapping(value = "/{userIdRichiestaVerifica}/verifiva_amicizia/{userIdDaVerificare}")
+    public ResponseEntity verificaAmicizia(@PathVariable Long userIdRichiestaVerifica, @PathVariable Long userIdDaVerificare){
+        try {
+            return new ResponseEntity(utenteService.sonoAmici(userIdRichiestaVerifica,userIdDaVerificare), HttpStatus.OK);
+        } catch (UtenteNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         }
     }
 
@@ -108,7 +94,8 @@ public class UtenteController {
             List<Utente> richieste = utenteService.richiesteAmicizia(userId);
             return new ResponseEntity(richieste,HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         }
     }
 
@@ -118,24 +105,32 @@ public class UtenteController {
             Set<Utente> amici = utenteService.getAllAmici(userId);
             return new ResponseEntity(amici,HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         }
     }
 
-    @GetMapping(value = "/{userId}/post")
-    public ResponseEntity post(@PathVariable Long userId){
+    @GetMapping(value = "/{userId}/post_list")
+    public ResponseEntity allPost(@PathVariable Long userId){
         try{
             List<Post> post = utenteService.getAllPost(userId);
             return new ResponseEntity(post,HttpStatus.OK);
         } catch (UtenteNonEsistenteException e) {
-            return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity(new Messaggio("l'utente non esiste"),HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
         }
     }
 
-    @GetMapping(value = "/search/{stringa}/{numPag}/{numOfPag}")
-    public ResponseEntity richiesteAmicizia(@PathVariable String stringa, @PathVariable int numPag, @PathVariable int numOfPag){
-        List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa, numPag-1, numOfPag);
+    @GetMapping(value = "/search/{stringa}/{numPag}/{numInPage}")
+    public ResponseEntity cercaUtenti(@PathVariable String stringa, @PathVariable int numPag, @PathVariable int numInPage){
+        List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa, numPag-1, numInPage);
         //List<Utente> utenti = utenteService.getUtentiNomeOrCognomeContain(stringa);
+        return new ResponseEntity(utenti,HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/search/{nome}/{cognome}/{numPag}/{numInPage}")
+    public ResponseEntity cercaUtenti(@PathVariable String nome, @PathVariable String cognome, @PathVariable int numPag, @PathVariable int numInPage){
+        List<Utente> utenti = utenteService.getUtentiNomeAndCognomeLike(nome, cognome, numPag-1, numInPage);
         return new ResponseEntity(utenti,HttpStatus.OK);
     }
 }

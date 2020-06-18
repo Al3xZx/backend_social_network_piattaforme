@@ -21,7 +21,8 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
     List<Utente> findAllByCognomeContaining(String cognome);
 
-    List<Utente> findAllByNomeAndCognome(String nome, String cognome);
+    @Query(value = "SELECT * FROM utente u WHERE u.nome like %?1% AND u.cognome like %?2%", nativeQuery = true)
+    List<Utente> selAllByNomeAndCognome(String nome, String cognome, Pageable pageable);
 
     Utente findByEmail(String email);
 

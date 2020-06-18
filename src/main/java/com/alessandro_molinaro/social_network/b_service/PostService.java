@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
@@ -129,23 +130,23 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostPage(Long userId, int numPage, int numOfPage) throws UtenteNonEsistenteException {
+    public List<Post> getPostPage(Long userId, int numPage, int numInPage) throws UtenteNonEsistenteException {
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;
         if(o.isPresent()) {
             u = o.get();
-            return postRepository.findAllByUtente(userId, PageRequest.of(numPage, numOfPage, Sort.by("dataCreazione").descending()));
+            return postRepository.findAllByUtente(u, PageRequest.of(numPage, numInPage, Sort.by("dataCreazione").descending()));
         } else
             throw new UtenteNonEsistenteException();
     }
 
     @Transactional
-    public List<Post> getPostDegliAmici(Long userId, int numPage, int numOfPage) throws UtenteNonEsistenteException {
+    public List<Post> getPostDegliAmici(Long userId, int numPage, int numInPage) throws UtenteNonEsistenteException {
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;
         if(o.isPresent()) {
             u = o.get();
-            return postRepository.selAllPostDiAmici(userId, PageRequest.of(numPage, numOfPage, Sort.by("data_creazione").descending()));
+            return postRepository.selAllPostDiAmici(userId, PageRequest.of(numPage, numInPage, Sort.by("data_creazione").descending()));
         } else
             throw new UtenteNonEsistenteException();
     }

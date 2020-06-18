@@ -25,32 +25,7 @@ public class UtenteService {
     @Autowired
     AreaGeograficaRepository areaGeograficaRepository;
 
-    @Transactional
-    public Utente registraUtente(Utente u) throws EmailEsistenteException, UtenteNonEsistenteException {
-        if(utenteRepository.existsByEmail(u.getEmail()))
-            throw new EmailEsistenteException();
-        Utente nuovo = new Utente(u.getNome(), u.getCognome(), u.getEmail(), u.getGenere());
-        utenteRepository.save(nuovo);
-        if(u.getAreaGeografica() != null)
-            aggiungiModificaAreaGeografica(nuovo.getId(), u.getAreaGeografica());
-        return nuovo;
-    }
 
-    @Transactional
-    public AreaGeografica aggiungiModificaAreaGeografica(Long userId, AreaGeografica ag)
-            throws UtenteNonEsistenteException {
-        AreaGeografica area = areaGeograficaRepository
-                .findByNazioneAndRegioneAndCitta(ag.getNazione(), ag.getRegione(), ag.getCitta());
-        Utente utente = utenteRepository.findById(userId).get();
-        if(utente == null) throw new UtenteNonEsistenteException();
-        if(area == null){
-            area = new AreaGeografica(ag.getNazione(), ag.getRegione(), ag.getCitta());
-            areaGeograficaRepository.save(area);
-        }
-        utente.setAreaGeografica(area);
-        area.getResidenti().add(utente);
-        return area;
-    }
 
     /*-------------------------ricerca utenti------------------------------*/
 
@@ -73,10 +48,17 @@ public class UtenteService {
     }
 
     @Transactional(readOnly = true)
-    public List<Utente> getUtentiNomeOrCognomeContain(String s, int numPag, int numOfPage){
+    public List<Utente> getUtentiNomeOrCognomeContain(String s, int numPag, int numInPage){
         //return utenteRepository.findAllByNomeContainingOrCognomeContaining(s);
-        return utenteRepository.selAllByNomeContainingOrCognomeContaining(s, PageRequest.of(numPag,numOfPage));
+        return utenteRepository.selAllByNomeContainingOrCognomeContaining(s, PageRequest.of(numPag,numInPage));
     }
+
+    @Transactional(readOnly = true)
+    public List<Utente> getUtentiNomeAndCognomeLike(String nome, String cognome, int numPag, int numInPage){
+        //return utenteRepository.findAllByNomeContainingOrCognomeContaining(s);
+        return utenteRepository.selAllByNomeAndCognome(nome, cognome, PageRequest.of(numPag,numInPage));
+    }
+
 
 //    @Transactional(readOnly = true)
 //    public List<Utente> getUtentiByNome(String nome){
@@ -189,5 +171,23 @@ public class UtenteService {
             return u.getPosts();
         } else
             throw new UtenteNonEsistenteException();
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean sonoAmici(Long userIdRichiestaVerifica, Long userIdDaVerificare) throws UtenteNonEsistenteException {
+        Optional<Utente> oRichiedente = utenteRepository.findById(userIdRichiestaVerifica);
+        Optional<Utente> oRicevente = utenteRepository.findById(userIdDaVerificare);
+        Utente richiedente;
+        Utente daVerificare;
+        if(oRichiedente.isPresent() && oRicevente.isPresent()) {
+            richiedente = oRichiedente.get();
+            daVerificare = oRicevente.get();
+        } else
+            throw new UtenteNonEsistenteException();
+        Set<Utente> amiciRichiedente = richiedente.getAmici();
+        for(Utente amico : amiciRichiedente)
+            if(amico.getId().equals(userIdDaVerificare))
+                return true;
+        return false;
     }
 }

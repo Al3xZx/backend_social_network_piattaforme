@@ -1,13 +1,14 @@
 package com.alessandro_molinaro.social_network.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "likes")
+@Table(name = "likes", uniqueConstraints = @UniqueConstraint(columnNames = {"id_post", "id_utente"}))
 public class Like implements Serializable {
     private static final long serialVersionUID = 5514858274833550798L;
 
@@ -16,12 +17,13 @@ public class Like implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy@HH:mm:ss")
     @Column(name = "data_creazione", nullable = false)
     private LocalDateTime dataCreazione = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "id_post", nullable = false)
+    @JsonIgnore
     private Post post;
 
     @ManyToOne
