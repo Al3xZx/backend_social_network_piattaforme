@@ -36,11 +36,11 @@ public class Post implements Serializable {
     @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     //@JsonIgnore
     private List<Commento> commenti = new LinkedList<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     //@JsonIgnore
     private Set<Like> likes = new HashSet<>();
 
@@ -91,4 +91,6 @@ public class Post implements Serializable {
     public void setLikes(Set<Like> likes) {
         this.likes = likes;
     }
+
+
 }

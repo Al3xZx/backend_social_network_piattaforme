@@ -8,18 +8,13 @@ import com.alessandro_molinaro.social_network.d_entity.Commento;
 import com.alessandro_molinaro.social_network.d_entity.Like;
 import com.alessandro_molinaro.social_network.d_entity.Post;
 import com.alessandro_molinaro.social_network.d_entity.Utente;
-import com.alessandro_molinaro.social_network.support.exception.LikePresenteException;
-import com.alessandro_molinaro.social_network.support.exception.NonAmiciException;
-import com.alessandro_molinaro.social_network.support.exception.PostNonEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.UtenteNonEsistenteException;
+import com.alessandro_molinaro.social_network.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +64,8 @@ public class PostService {
             post = op.get();
         } else
             throw new PostNonEsistenteException();
+        if(!post.getUtente().getId().equals(utente.getId()))
+            throw new PostNonEsistenteException();
 //        List<Post> posts= utente.getPosts();
 //        if(!posts.remove(post))
 //            throw new PostNonEsistenteException();
@@ -91,8 +88,8 @@ public class PostService {
         } else
             throw new PostNonEsistenteException();
 
-        if(likeRepository.existsByUtenteAndPost(utente, post))
-            throw new LikePresenteException();
+//        if(likeRepository.existsByUtenteAndPost(utente, post))
+//            throw new LikePresenteException(); (è superfluo poichè è stato introdotto il vincolo unique)
 
         Like l = new Like();
         l.setPost(post);
@@ -118,7 +115,7 @@ public class PostService {
             post = op.get();
         } else
             throw new PostNonEsistenteException();
-        if(!utente.getAmici().contains(post.getUtente()))
+        if( (!utente.getAmici().contains(post.getUtente())) && (utente.getId() != post.getUtente().getId()) )
             throw new NonAmiciException();
         Commento nuovoCommento = new Commento();
         nuovoCommento.setTesto(c.getTesto());
@@ -127,6 +124,25 @@ public class PostService {
         commentoRepository.save(nuovoCommento);
         post.getCommenti().add(nuovoCommento);
         return nuovoCommento;
+    }
+
+    @Transactional
+    public void removeCommento(long commentoId, Long userId)throws UtenteNonEsistenteException, CommentoNonEsistenteException {
+        Optional<Commento> oc = commentoRepository.findById(commentoId);
+        Optional<Utente> ou = utenteRepository.findById(userId);
+        Utente utente;
+        Commento commento;
+        if(ou.isPresent()) {
+            utente = ou.get();
+        } else
+            throw new UtenteNonEsistenteException();
+        if(oc.isPresent()) {
+            commento = oc.get();
+        } else
+            throw new CommentoNonEsistenteException();
+        if(!commento.getUtente().getId().equals(utente.getId()))
+            throw new CommentoNonEsistenteException();
+        commentoRepository.delete(commento);
     }
 
     @Transactional(readOnly = true)

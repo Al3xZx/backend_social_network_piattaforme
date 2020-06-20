@@ -4,10 +4,7 @@ import com.alessandro_molinaro.social_network.b_service.PostService;
 import com.alessandro_molinaro.social_network.d_entity.Commento;
 import com.alessandro_molinaro.social_network.d_entity.Like;
 import com.alessandro_molinaro.social_network.d_entity.Post;
-import com.alessandro_molinaro.social_network.support.exception.LikePresenteException;
-import com.alessandro_molinaro.social_network.support.exception.NonAmiciException;
-import com.alessandro_molinaro.social_network.support.exception.PostNonEsistenteException;
-import com.alessandro_molinaro.social_network.support.exception.UtenteNonEsistenteException;
+import com.alessandro_molinaro.social_network.support.exception.*;
 import com.alessandro_molinaro.social_network.support.messageForClient.Messaggio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +33,7 @@ public class PostController {
         }
     }
 
-    @DeleteMapping(value = "/delete/{userId}/{postId}")
+    @DeleteMapping(value = "/delete/{userId}/{postId}")//userid deve essere il proprietario del post
     public ResponseEntity delPost(@PathVariable Long postId, @PathVariable Long userId){
         try {
             postService.removePost(postId, userId);
@@ -81,6 +78,19 @@ public class PostController {
         } catch (NonAmiciException e) {
            // return new ResponseEntity(new Messaggio("non è possibile aggiungere un commento"), HttpStatus.BAD_REQUEST);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non è possibile aggiungere un commento", e);
+        }
+    }
+
+    @DeleteMapping(value = "/commento/delete/{userId}/{commentoId}")//userid deve essere il proprietario del commento
+    public ResponseEntity delCommento(@PathVariable Long commentoId, @PathVariable Long userId){
+        try {
+            postService.removeCommento(commentoId, userId);
+            return new ResponseEntity(new Messaggio("commento eliminato correttamente"), HttpStatus.OK);
+        } catch (UtenteNonEsistenteException e) {
+            //return new ResponseEntity(new Messaggio("utente non esistente"), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "l'utente non esiste", e);
+        } catch (CommentoNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "il commento non esiste", e);
         }
     }
 

@@ -42,7 +42,7 @@ public class AccountingService {
     @Transactional
     public Utente registraAccount(AccountUtente a, Utente utente)
             throws UsernameEsistenteException, EmailEsistenteException, UtenteNonEsistenteException {
-        Optional<AccountUtente> ol = accountUtenteRepository.findById(a.getUsername());//TODO testare con username = null
+        Optional<AccountUtente> ol = accountUtenteRepository.findById(a.getUsername());
         if(ol.isPresent()) throw new UsernameEsistenteException();
         //if(password.length() < 8) throw new PasswordNonSufficienteException();//impostare il @Valid
         AccountUtente nuovoAccount = new AccountUtente();
@@ -69,11 +69,20 @@ public class AccountingService {
             throws UtenteNonEsistenteException {
         AreaGeografica area = areaGeograficaRepository
                 .findByNazioneAndRegioneAndCitta(ag.getNazione(), ag.getRegione(), ag.getCitta());
-        Utente utente = utenteRepository.findById(userId).get();
-        if(utente == null) throw new UtenteNonEsistenteException();
+        Optional<Utente> ou = utenteRepository.findById(userId);
+        Utente utente = ou.isPresent() ? ou.get() : null;
+        if(utente == null)
+            throw new UtenteNonEsistenteException();
         if(area == null){
             area = new AreaGeografica(ag.getNazione(), ag.getRegione(), ag.getCitta());
             areaGeograficaRepository.save(area);
+        }
+        if(utente.getAreaGeografica() != null){
+            Optional<AreaGeografica> oa = areaGeograficaRepository.findById(utente.getAreaGeografica().getId());
+            if(oa.isPresent()) {
+                AreaGeografica a = oa.get();
+                a.getResidenti().remove(utente);
+            }
         }
         utente.setAreaGeografica(area);
         area.getResidenti().add(utente);

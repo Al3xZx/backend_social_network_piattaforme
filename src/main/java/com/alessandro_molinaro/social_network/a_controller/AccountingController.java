@@ -28,9 +28,16 @@ public class AccountingController {
     public ResponseEntity registrazione(
             @Valid @RequestBody Utente utente, @PathVariable String username, @PathVariable String password){
 
-        if (password == null || password.length() < 8) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "errore di validazione dei campi account");
+        if (utente == null ||utente.getNome() == null || utente.getCognome() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nome e cognome obbligatori");
         }
+        if (username == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username obbligatorio");
+        }
+        if (password == null || password.length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "errore di validazione password");
+        }
+
         AccountUtente accountUtente = new AccountUtente(username, password);
         try {
             Utente u = accountingService.registraAccount(accountUtente, utente);

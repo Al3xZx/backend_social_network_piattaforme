@@ -24,13 +24,14 @@ public class Utente implements Serializable {
     private Long id;
 
     @Column(nullable = false, length = 50)
+    @NotNull
     private String nome;
 
     @Column(nullable = false, length = 50)
+    @NotNull
     private String cognome;
 
-    @Column(nullable = false, length = 50)
-    @NotNull
+    @Column(length = 50)
     @Email
     private String email;
 
