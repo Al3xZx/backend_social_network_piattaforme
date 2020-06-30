@@ -41,7 +41,6 @@ public class Utente implements Serializable {
     @JoinColumn(name = "id_area_geografica", nullable = true)
     private AreaGeografica areaGeografica;
 
-    //verificare....//TODO
     @ManyToMany()
     @JoinTable(name = "amici",
             joinColumns = {@JoinColumn(name = "id_utente_A", referencedColumnName = "id")},
@@ -60,7 +59,7 @@ public class Utente implements Serializable {
     @JsonIgnore
     private List<Commento> commenti = new LinkedList<>();//commenti effettuati da this
 
-    @OneToMany(mappedBy = "utente") //se elimino un post lo elimino anche dalla tabella post
+    @OneToMany(mappedBy = "utente")
     @JsonIgnore
     private List<Post> posts = new LinkedList<>();//post effettuati da this
 

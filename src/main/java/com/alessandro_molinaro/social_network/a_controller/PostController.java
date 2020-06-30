@@ -77,7 +77,7 @@ public class PostController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "il post non esiste", e);
         } catch (NonAmiciException e) {
            // return new ResponseEntity(new Messaggio("non è possibile aggiungere un commento"), HttpStatus.BAD_REQUEST);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "non è possibile aggiungere un commento", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "NON SIETE AMICI, non è possibile aggiungere un commento", e);
         }
     }
 

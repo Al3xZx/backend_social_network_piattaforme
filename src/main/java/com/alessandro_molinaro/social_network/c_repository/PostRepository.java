@@ -5,9 +5,11 @@ import com.alessandro_molinaro.social_network.d_entity.Utente;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByUtente(Utente utente, Pageable pageable);

@@ -29,7 +29,7 @@ public class UtenteService {
 
     /*-------------------------ricerca utenti------------------------------*/
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) //propagation di default è:  Propagation.REQUIRED.
     public Utente getUtente(Long userId)throws UtenteNonEsistenteException{
         Optional<Utente> o = utenteRepository.findById(userId);
         Utente u;
@@ -74,8 +74,6 @@ public class UtenteService {
 //    public List<Utente> getUtentiByNomeAndCognome(String nome, String cognome){
 //        return utenteRepository.findAllByNomeAndCognome(nome, cognome);
 //    }
-
-    //TODO ricerca utenti per città, regione o nazione
 
     /*-------------------------gestione richiesta amicizia------------------------------*/
 
