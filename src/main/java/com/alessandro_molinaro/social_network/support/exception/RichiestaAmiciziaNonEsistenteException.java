@@ -1,4 +1,3 @@
 package com.alessandro_molinaro.social_network.support.exception;
 
-public class RichiestaAmiciziaNonEsistenteException extends Exception {
-}
+public class RichiestaAmiciziaNonEsistenteException extends Exception {}
