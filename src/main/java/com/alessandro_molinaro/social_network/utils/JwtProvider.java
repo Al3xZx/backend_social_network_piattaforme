@@ -1,16 +1,16 @@
 package com.alessandro_molinaro.social_network.utils;
 
+import com.alessandro_molinaro.social_network.configuration.SecurityConfig;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
-
+import org.joda.time.DateTime;
 
 import java.util.Map;
 
 /** The type Jwt provider. */
-
 @Slf4j
 public class JwtProvider {
 
@@ -23,8 +23,8 @@ public class JwtProvider {
    * @param payloadClaims the payload claims
    * @return the JWT string
    */
-  public static String createJwt(String subject, Map payloadClaims) {
-    JWTCreator.Builder builder =
+  public static String createJwt(String subject, Map<String, String> payloadClaims) {
+    JWTCreator.Builder creator =
         JWT.create()
             .withSubject(subject)
             .withIssuer(issuer)
@@ -32,13 +32,13 @@ public class JwtProvider {
             .withExpiresAt(DateTime.now().plusMonths(1).toDate());
 
     if (payloadClaims != null && !payloadClaims.isEmpty()) {
-      for (Map.Entry entry : payloadClaims.entrySet()) {
-        builder.withClaim(entry.getKey(), entry.getValue().toString());
+      for (Map.Entry<String, String> entry : payloadClaims.entrySet()) {
+        creator.withClaim(entry.getKey(), entry.getValue());
       }
     } else {
       log.warn("You are building a JWT without header claims!");
     }
-    return builder.sign(Algorithm.HMAC256(SecurityConfig.secret));
+    return creator.sign(Algorithm.HMAC256(SecurityConfig.secret));
   }
 
   /**

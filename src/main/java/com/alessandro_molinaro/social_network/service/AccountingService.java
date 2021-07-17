@@ -83,4 +83,17 @@ public class AccountingService {
     area.getResidenti().add(utente);
     return area;
   }
+
+
+
+  //todo refactoring this
+  @Transactional(readOnly = true)
+  public Utente getByUsernameAndPassword(String username, String password) {
+    try {
+      return this.verificaRegistrazione(new AccountUtente(username, password));
+    } catch (PasswordErrataException | UsernameErratoException e) {
+     return null;
+    }
+  }
+
 }
